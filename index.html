@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diário de Energia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">seu espaço · privado</p>
+  <h1>Diário de Energia</h1>
+  <p class="sub">Descarregue o que está sentindo. Com o tempo, o painel mostra os padrões — quando sua energia sobe, quando cai, o que costuma ajudar e que som combina com cada momento.</p>
+
+  <!-- NÍVEL 2: Campo de Partículas -->
+  <div class="card" id="card-particles">
+    <h2>Campo de energia</h2>
+    <p class="h2-sub">Mova os sliders e veja o campo reagir ao seu estado.</p>
+    <canvas id="energy-canvas"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>Como você está agora?</h2>
+    <p class="h2-sub">Texto livre é opcional — as marcações já bastam.</p>
+    <textarea id="texto" placeholder="Escreva livremente, se quiser — ou pule direto para as marcações abaixo."></textarea>
+
+    <div class="sliders">
+      <div class="slider-row">
+        <label>Energia física <span class="val" id="v-fisica">3</span></label>
+        <input type="range" id="s-fisica" min="1" max="5" value="3">
+        <div class="scale-labels"><span>Esgotado</span><span>Cheio de energia</span></div>
+      </div>
+      <div class="slider-row">
+        <label>Energia mental <span class="val" id="v-mental">3</span></label>
+        <input type="range" id="s-mental" min="1" max="5" value="3">
+        <div class="scale-labels"><span>Sem foco</span><span>Mente clara</span></div>
+      </div>
+      <div class="slider-row">
+        <label>Humor <span class="val" id="v-humor">3</span></label>
+        <input type="range" id="s-humor" min="1" max="5" value="3">
+        <div class="scale-labels"><span>Pesado</span><span>Leve</span></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="btn-registrar">Só registrar</button>
+      <button class="btn-primary" id="btn-sugerir">Sugestão de atividade</button>
+    </div>
+    <div class="actions" style="margin-top:10px;">
+      <button class="btn-musica" id="btn-musica" style="width:100%;">🎵 Que som combina agora?</button>
+    </div>
+
+    <div class="result" id="resultado">
+      <span class="tag" id="resultado-tag">registrado</span>
+      <span id="resultado-texto"></span>
+      <div class="musica-linha" id="musica-linha" style="display:none;">
+        <span class="tag">som pra agora</span>
+        <span id="musica-texto"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Seu perfil musical</h2>
+    <p class="h2-sub">Vá adicionando estilos, artistas ou trilhas que combinam com você — a recomendação prioriza isso antes de sugerir algo genérico.</p>
+    <div class="musica-form">
+      <div class="musica-row">
+        <input type="text" id="musica-nome" placeholder="ex: Lana Del Rey, lo-fi, trilha orquestral...">
+        <select id="musica-tag">
+          <option value="calmo">calmo</option>
+          <option value="triste">acolhedor / triste</option>
+          <option value="foco">foco</option>
+          <option value="animado">animado</option>
+          <option value="orquestral">orquestral</option>
+          <option value="outro">outro</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="btn-add-musica">Adicionar ao perfil</button>
+    </div>
+    <div class="chips" id="musica-chips"></div>
+  </div>
+
+  <div class="card">
+    <h2>Ideias por clima</h2>
+    <p class="h2-sub">Estilos pra explorar quando quiser sair do que já conhece, organizados por estado.</p>
+    <div class="curadoria" id="curadoria"></div>
+  </div>
+
+  <div class="card">
+    <h2>Sua rede</h2>
+    <div id="rede-container"><p class="empty">Ainda sem registros. A linha aparece aqui conforme você for descarregando — sobe quando sua energia sobe, afunda quando você está mais esgotado.</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Padrões percebidos</h2>
+    <div id="insights"><p class="empty">Com uns 5 registros já dá pra começar a ver tendência de horário e dia da semana.</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Últimos registros</h2>
+    <div class="entry-list" id="entry-list"><p class="empty">Nada por aqui ainda.</p></div>
+  </div>
+
+  <p class="footer-note">Os dados ficam só neste app, salvos localmente para você.<br>Nenhuma emoção registrada aqui é guardada na memória do chat — só o seu perfil musical vira contexto lá, porque gosto musical pode ficar salvo.</p>
+</div>
+
+<script type="module" src="src/js/main.js"></script>
+</body>
+</html>
