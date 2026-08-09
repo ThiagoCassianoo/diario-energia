@@ -1,18 +1,8 @@
 {
   "name": "diario-energia",
-  "version": "1.0.0",
-  "description": "App pessoal para registrar energia, humor e padrões emocionais",
+  "version": "3.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "vite": "^5.0.0"
-  },
-  "dependencies": {
-    "three": "^0.160.0",
-    "gsap": "^3.12.0"
-  }
+  "scripts": { "dev": "vite", "build": "vite build" },
+  "dependencies": { "three": "^0.160.0", "gsap": "^3.12.5" },
+  "devDependencies": { "vite": "^5.0.0" }
 }

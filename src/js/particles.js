@@ -1,139 +1,71 @@
-let canvas, ctx, W, H, particles = [], animId;
-let state = { fisica: 3, mental: 3, humor: 3 };
-
-function lerp(a, b, t) { return a + (b - a) * t; }
-
-function getHumorColor(h) {
-  const t = (h - 1) / 4;
-  // Pesado (1) = azul profundo #5B7FA8 -> Leve (5) = âmbar quente #D4A24E
-  const r = Math.round(lerp(91, 212, t));
-  const g = Math.round(lerp(127, 162, t));
-  const b = Math.round(lerp(168, 78, t));
-  return { r, g, b };
+import * as THREE from 'three';
+let scene,camera,renderer,points,lines,group,animId,entriesData=[];
+let mouse=new THREE.Vector2(),targetRotation=new THREE.Vector2();
+const COLORS={low:new THREE.Color('#B8615A'),mid:new THREE.Color('#8FA9C7'),high:new THREE.Color('#D4A24E')};
+export function initConstellation(containerId){
+  const container=document.getElementById(containerId);if(!container)return;
+  const w=container.clientWidth,h=container.clientHeight;
+  scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x05070a,0.035);
+  camera=new THREE.PerspectiveCamera(60,w/h,0.1,100);camera.position.z=8;
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setSize(w,h);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setClearColor(0x000000,0);container.innerHTML='';container.appendChild(renderer.domElement);
+  group=new THREE.Group();scene.add(group);
+  const starGeo=new THREE.BufferGeometry(),starCount=400,starPos=new Float32Array(starCount*3);
+  for(let i=0;i<starCount*3;i++)starPos[i]=(Math.random()-0.5)*30;
+  starGeo.setAttribute('position',new THREE.BufferAttribute(starPos,3));
+  const starMat=new THREE.PointsMaterial({color:0xffffff,size:0.02,transparent:true,opacity:0.3});
+  scene.add(new THREE.Points(starGeo,starMat));
+  container.addEventListener('mousemove',(e)=>{const rect=container.getBoundingClientRect();mouse.x=((e.clientX-rect.left)/rect.width)*2-1;mouse.y=-((e.clientY-rect.top)/rect.height)*2+1});
+  window.addEventListener('resize',()=>{if(!container)return;const nw=container.clientWidth,nh=container.clientHeight;camera.aspect=nw/nh;camera.updateProjectionMatrix();renderer.setSize(nw,nh)});
+  updateConstellation([]);animate();
 }
-
-function initParticles() {
-  canvas = document.getElementById('energy-canvas');
-  if (!canvas) return;
-  ctx = canvas.getContext('2d');
-  resize();
-  window.addEventListener('resize', resize);
-
-  particles = [];
-  for (let i = 0; i < 80; i++) {
-    particles.push(createParticle());
-  }
-  draw();
-}
-
-function createParticle() {
-  const cssW = canvas.width / (window.devicePixelRatio || 1);
-  const cssH = canvas.height / (window.devicePixelRatio || 1);
-  return {
-    x: Math.random() * cssW,
-    y: Math.random() * cssH,
-    baseVx: (Math.random() - 0.5) * 0.4,
-    baseVy: (Math.random() - 0.5) * 0.4,
-    r: Math.random() * 1.6 + 0.5,
-    phase: Math.random() * Math.PI * 2,
-    speed: Math.random() * 0.02 + 0.01
-  };
-}
-
-function resize() {
-  if (!canvas) return;
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  W = canvas.width = rect.width * dpr;
-  H = canvas.height = rect.height * dpr;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-
-function draw() {
-  if (!ctx) return;
-  const cssW = W / (window.devicePixelRatio || 1);
-  const cssH = H / (window.devicePixelRatio || 1);
-
-  // Fade suave para rastro
-  ctx.fillStyle = 'rgba(22, 28, 43, 0.25)';
-  ctx.fillRect(0, 0, cssW, cssH);
-
-  const { fisica, mental, humor } = state;
-  const color = getHumorColor(humor);
-
-  // Gravidade baseada na energia física
-  // 1 = pesado (cai), 5 = leve (sobe)
-  const gravity = lerp(0.08, -0.06, (fisica - 1) / 4);
-
-  // Ordem baseada na energia mental
-  // 1 = caótico (noise alto), 5 = ordenado (ondas suaves)
-  const orderliness = (mental - 1) / 4; // 0 a 1
-
-  const time = Date.now() * 0.001;
-
-  particles.forEach((p, i) => {
-    // Movimento base
-    p.phase += p.speed;
-
-    // Componente caótico vs ordenado
-    const noiseX = Math.sin(p.phase * 3 + i) * 0.3 * (1 - orderliness);
-    const noiseY = Math.cos(p.phase * 2.5 + i * 0.7) * 0.3 * (1 - orderliness);
-
-    // Componente ordenado (ondas suaves)
-    const waveX = Math.sin(time + i * 0.2) * 0.5 * orderliness;
-    const waveY = Math.cos(time * 0.8 + i * 0.15) * 0.4 * orderliness;
-
-    p.x += p.baseVx + noiseX + waveX;
-    p.y += p.baseVy + gravity + noiseY + waveY;
-
-    // Wrap around
-    if (p.x < -5) p.x = cssW + 5;
-    if (p.x > cssW + 5) p.x = -5;
-    if (p.y < -5) p.y = cssH + 5;
-    if (p.y > cssH + 5) p.y = -5;
-
-    // Brilho baseado na energia (física + mental)
-    const energy = (fisica + mental) / 2;
-    const alpha = lerp(0.25, 0.85, (energy - 1) / 4) * (0.7 + 0.3 * Math.sin(p.phase));
-
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r * lerp(0.8, 1.4, (energy - 1) / 4), 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
-    ctx.fill();
+export function updateConstellation(entries){
+  entriesData=entries;
+  while(group.children.length>0){const child=group.children[0];if(child.geometry)child.geometry.dispose();if(child.material)child.material.dispose();group.remove(child)}
+  if(entries.length<2)return;
+  const last=entries.slice(-20),positions=[],colors=[],sizes=[];
+  last.forEach((e,i)=>{
+    const t=i/(last.length-1),x=(t-0.5)*10,y=((e.fisica+e.mental)/2-3)*1.5,z=(e.humor-3)*1.2;
+    positions.push(x,y,z);
+    const score=(e.fisica+e.mental+e.humor)/3,c=score<2.5?COLORS.low:score<3.5?COLORS.mid:COLORS.high;
+    colors.push(c.r,c.g,c.b);sizes.push(lerp(0.08,0.18,(e.humor-1)/4));
   });
-
-  // Conexões entre partículas próximas (mais visíveis com mental alta)
-  const maxDist = lerp(35, 70, orderliness);
-  const connAlpha = lerp(0.03, 0.12, orderliness);
-
-  for (let i = 0; i < particles.length; i++) {
-    for (let j = i + 1; j < particles.length; j++) {
-      const dx = particles[i].x - particles[j].x;
-      const dy = particles[i].y - particles[j].y;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      if (d < maxDist) {
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(particles[j].x, particles[j].y);
-        const a = connAlpha * (1 - d / maxDist);
-        ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${a})`;
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-      }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+  geo.setAttribute('size',new THREE.Float32BufferAttribute(sizes,1));
+  const mat=new THREE.ShaderMaterial({
+    uniforms:{uTime:{value:0}},
+    vertexShader:`attribute float size;varying vec3 vColor;uniform float uTime;void main(){vColor=color;vec4 mvPosition=modelViewMatrix*vec4(position,1.0);float pulse=1.0+0.2*sin(uTime*2.0+position.x*3.0);gl_PointSize=size*300.0*pulse/-mvPosition.z;gl_Position=projectionMatrix*mvPosition;}`,
+    fragmentShader:`varying vec3 vColor;void main(){float dist=length(gl_PointCoord-vec2(0.5));if(dist>0.5)discard;float alpha=1.0-smoothstep(0.3,0.5,dist);gl_FragColor=vec4(vColor,alpha*0.9);}`,
+    transparent:true,vertexColors:true,blending:THREE.AdditiveBlending,depthWrite:false
+  });
+  points=new THREE.Points(geo,mat);group.add(points);
+  if(last.length>=2){
+    const linePositions=[],lineColors=[];
+    for(let i=0;i<last.length-1;i++){
+      const t1=i/(last.length-1),t2=(i+1)/(last.length-1);
+      const x1=(t1-0.5)*10,y1=((last[i].fisica+last[i].mental)/2-3)*1.5,z1=(last[i].humor-3)*1.2;
+      const x2=(t2-0.5)*10,y2=((last[i+1].fisica+last[i+1].mental)/2-3)*1.5,z2=(last[i+1].humor-3)*1.2;
+      linePositions.push(x1,y1,z1,x2,y2,z2);
+      const score=(last[i].fisica+last[i].mental+last[i].humor)/3,c=score<2.5?COLORS.low:score<3.5?COLORS.mid:COLORS.high;
+      lineColors.push(c.r,c.g,c.b,c.r,c.g,c.b);
     }
+    const lineGeo=new THREE.BufferGeometry();
+    lineGeo.setAttribute('position',new THREE.Float32BufferAttribute(linePositions,3));
+    lineGeo.setAttribute('color',new THREE.Float32BufferAttribute(lineColors,3));
+    const lineMat=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.25,blending:THREE.AdditiveBlending});
+    lines=new THREE.LineSegments(lineGeo,lineMat);group.add(lines);
   }
-
-  animId = requestAnimationFrame(draw);
 }
-
-export function updateState(fisica, mental, humor) {
-  state = { fisica, mental, humor };
+function lerp(a,b,t){return a+(b-a)*t}
+function animate(){
+  animId=requestAnimationFrame(animate);const time=performance.now()*0.001;
+  if(points&&points.material.uniforms)points.material.uniforms.uTime.value=time;
+  targetRotation.x=mouse.y*0.3;targetRotation.y=mouse.x*0.5;
+  group.rotation.x+=(targetRotation.x-group.rotation.x)*0.02;
+  group.rotation.y+=(targetRotation.y-group.rotation.y)*0.02;
+  group.rotation.y+=0.001;renderer.render(scene,camera);
 }
-
-export function startParticles() {
-  initParticles();
-}
-
-export function stopParticles() {
-  if (animId) cancelAnimationFrame(animId);
-}
+export function stopConstellation(){if(animId)cancelAnimationFrame(animId)}
