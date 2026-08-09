@@ -5,22 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diário de Energia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="src/css/style.css">
 </head>
 <body>
 <canvas id="bg-canvas"></canvas>
+
 <div class="wrap">
   <header class="hero">
     <p class="eyebrow">seu espaço · privado</p>
-    <h1 class="hero-title">Diário de Energia</h1>
-    <p class="hero-sub">Descarregue o que está sentindo.<br>Com o tempo, o painel revela os padrões.</p>
+    <h1 class="hero-title">
+      <span class="hero-line">Diário</span>
+      <span class="hero-line accent">de Energia</span>
+    </h1>
+    <p class="hero-sub">Descarregue o que está sentindo. Com o tempo, o painel revela os padrões — quando sua energia sobe, quando cai, o que costuma ajudar.</p>
   </header>
 
-  <section class="card card-input" id="card-input">
+  <section class="card card-3d card-input" id="card-input">
+    <div class="card-shine"></div>
     <h2 class="section-title">Como você está agora?</h2>
     <p class="section-sub">Texto livre é opcional — as marcações já bastam.</p>
     <textarea id="texto" placeholder="Escreva livremente, se quiser..."></textarea>
+
     <div class="sliders">
       <div class="slider-row" data-color="fisica">
         <label><span>Energia física</span><span class="val" id="v-fisica">3</span></label>
@@ -38,6 +44,7 @@
         <div class="scale-labels"><span>Pesado</span><span>Leve</span></div>
       </div>
     </div>
+
     <div class="actions">
       <button class="btn-secondary" id="btn-registrar">Só registrar</button>
       <button class="btn-primary" id="btn-sugerir">Sugestão de atividade</button>
@@ -45,6 +52,7 @@
     <div class="actions" style="margin-top:12px;">
       <button class="btn-musica" id="btn-musica">Que som combina agora?</button>
     </div>
+
     <div class="result" id="resultado">
       <span class="tag" id="resultado-tag">registrado</span>
       <span id="resultado-texto"></span>
@@ -55,7 +63,8 @@
     </div>
   </section>
 
-  <section class="card" id="card-musica">
+  <section class="card card-3d" id="card-musica">
+    <div class="card-shine"></div>
     <h2 class="section-title">Seu perfil musical</h2>
     <p class="section-sub">Adicione estilos e artistas que combinam com você.</p>
     <div class="musica-form">
@@ -75,35 +84,39 @@
     <div class="chips" id="musica-chips"></div>
   </section>
 
-  <section class="card" id="card-curadoria">
+  <section class="card card-3d" id="card-curadoria">
+    <div class="card-shine"></div>
     <h2 class="section-title">Ideias por clima</h2>
     <p class="section-sub">Estilos pra explorar quando quiser sair do que já conhece.</p>
     <div class="curadoria" id="curadoria"></div>
   </section>
 
-  <section class="card card-wide" id="card-constellation">
+  <section class="card card-3d card-wide" id="card-constellation">
+    <div class="card-shine"></div>
     <h2 class="section-title">Sua constelação</h2>
-    <p class="section-sub">Cada registro é uma estrela no seu céu emocional.</p>
+    <p class="section-sub">Cada registro é uma estrela no seu céu emocional. Arraste para explorar.</p>
     <div id="constellation-container">
       <p class="empty">Ainda sem registros. A constelação se forma conforme você for descarregando.</p>
     </div>
   </section>
 
-  <section class="card" id="card-insights">
+  <section class="card card-3d" id="card-insights">
+    <div class="card-shine"></div>
     <h2 class="section-title">Padrões percebidos</h2>
     <div id="insights"><p class="empty">Com uns 5 registros já dá pra começar a ver tendências.</p></div>
   </section>
 
-  <section class="card" id="card-historico">
+  <section class="card card-3d" id="card-historico">
+    <div class="card-shine"></div>
     <h2 class="section-title">Últimos registros</h2>
     <div class="entry-list" id="entry-list"><p class="empty">Nada por aqui ainda.</p></div>
   </section>
 
   <footer class="footer-note">
-    Os dados ficam só neste app, salvos localmente.<br>
-    Nenhuma emoção registrada aqui é guardada na memória do chat.
+    Os dados ficam só neste app, salvos localmente para você.
   </footer>
 </div>
+
 <script type="module" src="src/js/main.js"></script>
 </body>
 </html>
